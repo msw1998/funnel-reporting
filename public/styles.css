@@ -1,0 +1,344 @@
+/* ═══════════════════════════════════════════
+   Base & Reset
+═══════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #EBF3FC;
+  color: #1a2e4a;
+  min-height: 100vh;
+}
+
+/* ═══════════════════════════════════════════
+   Header
+═══════════════════════════════════════════ */
+.header {
+  background: #0D2137;
+  color: #fff;
+  padding: 22px 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.header h1 { font-size: 1.45rem; font-weight: 700; letter-spacing: 0.01em; }
+.header p  { font-size: 0.85rem; margin-top: 4px; opacity: 0.75; }
+
+.date-badge {
+  background: #F5E642;
+  color: #0D2137;
+  font-weight: 700;
+  font-size: 0.82rem;
+  padding: 6px 14px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+/* ═══════════════════════════════════════════
+   Tab bar
+═══════════════════════════════════════════ */
+.tab-bar {
+  background: #fff;
+  padding: 10px 32px;
+  border-bottom: 1px solid #dde8f5;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.tab-btn {
+  padding: 8px 22px;
+  border: 2px solid #ccc;
+  border-radius: 6px;
+  background: #fff;
+  color: #1a2e4a;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.tab-btn.active {
+  background: #2B7CE9;
+  border-color: #2B7CE9;
+  color: #fff;
+}
+.tab-btn:hover:not(.active) { border-color: #2B7CE9; color: #2B7CE9; }
+
+/* ═══════════════════════════════════════════
+   Loading / Error states
+═══════════════════════════════════════════ */
+.state-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 80px 32px;
+  color: #5a7ba4;
+}
+.hidden { display: none !important; }
+.spinner {
+  width: 40px; height: 40px;
+  border: 4px solid #c9dff7;
+  border-top-color: #2B7CE9;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.error-text { color: #e05050; font-size: 0.95rem; max-width: 500px; text-align: center; }
+.retry-btn {
+  padding: 8px 22px; border: none; border-radius: 6px;
+  background: #2B7CE9; color: #fff; font-size: 0.9rem;
+  cursor: pointer; font-weight: 600;
+}
+.retry-btn:hover { background: #1a6cd8; }
+
+/* ═══════════════════════════════════════════
+   View / Layout
+═══════════════════════════════════════════ */
+.view { padding: 20px 32px 48px; }
+
+/* ═══════════════════════════════════════════
+   KPI Cards
+═══════════════════════════════════════════ */
+.kpi-cards {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.kpi-card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 18px 22px;
+  flex: 1 1 160px;
+  min-width: 150px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+  border-left: 4px solid #ccc;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.kpi-card.border-blue   { border-left-color: #2B7CE9; }
+.kpi-card.border-green  { border-left-color: #22C55E; }
+.kpi-card.border-orange { border-left-color: #F59E0B; }
+.kpi-card.border-purple { border-left-color: #8B5CF6; }
+.kpi-card.border-red    { border-left-color: #EF4444; }
+
+.kpi-label  { font-size: 0.77rem; color: #5a7ba4; font-weight: 500; }
+.kpi-value  { font-size: 1.75rem; font-weight: 700; color: #0D2137; line-height: 1.1; }
+.kpi-sub    { font-size: 0.74rem; color: #8aaccc; }
+
+/* Progress chip inside card */
+.kpi-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+  width: fit-content;
+}
+.kpi-chip.good   { background: #dcfce7; color: #16a34a; }
+.kpi-chip.warn   { background: #fef9c3; color: #ca8a04; }
+.kpi-chip.bad    { background: #fee2e2; color: #dc2626; }
+
+/* ═══════════════════════════════════════════
+   Dashboard Sections
+═══════════════════════════════════════════ */
+.dashboard-section {
+  background: #fff;
+  border-radius: 10px;
+  padding: 22px 24px 28px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+}
+.section-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #0D2137;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #2B7CE9;
+  margin-bottom: 20px;
+}
+
+/* ═══════════════════════════════════════════
+   Chart layout
+═══════════════════════════════════════════ */
+.chart-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 8px;
+}
+.chart-box { position: relative; }
+.chart-box.full-width { grid-column: 1 / -1; }
+.chart-label {
+  font-size: 0.79rem;
+  color: #5a7ba4;
+  margin-bottom: 10px;
+  font-weight: 500;
+}
+canvas { width: 100% !important; }
+
+/* ═══════════════════════════════════════════
+   Annual Target Progress Bars
+═══════════════════════════════════════════ */
+.progress-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.progress-item {}
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 7px;
+}
+.progress-label { font-size: 0.88rem; font-weight: 600; color: #0D2137; }
+.progress-values { font-size: 0.8rem; color: #5a7ba4; }
+.progress-values strong { color: #0D2137; }
+.progress-track {
+  height: 12px;
+  background: #EBF3FC;
+  border-radius: 6px;
+  overflow: hidden;
+  position: relative;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.6s ease;
+  min-width: 4px;
+}
+.progress-fill.good   { background: linear-gradient(90deg, #22C55E, #16a34a); }
+.progress-fill.warn   { background: linear-gradient(90deg, #F59E0B, #d97706); }
+.progress-fill.bad    { background: linear-gradient(90deg, #EF4444, #dc2626); }
+.progress-pct {
+  font-size: 0.76rem;
+  color: #5a7ba4;
+  margin-top: 4px;
+  text-align: right;
+}
+
+/* Target line marker (optional visual) */
+.progress-track-wrap { position: relative; }
+
+/* ═══════════════════════════════════════════
+   Key Insights
+═══════════════════════════════════════════ */
+.insights-section {
+  background: #0D2137;
+  border-radius: 10px;
+  padding: 20px 24px;
+  margin-top: 4px;
+}
+.insights-badge {
+  display: inline-block;
+  background: #F5E642;
+  color: #0D2137;
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 3px 10px;
+  border-radius: 4px;
+  letter-spacing: 0.08em;
+  margin-bottom: 14px;
+}
+.insights-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.insights-list li {
+  color: #d0e4f8;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  padding-left: 18px;
+  position: relative;
+}
+.insights-list li::before {
+  content: '›';
+  position: absolute;
+  left: 0;
+  color: #5BB8F5;
+  font-weight: 700;
+}
+.insights-list li .tag-good   { color: #4ade80; font-weight: 700; }
+.insights-list li .tag-warn   { color: #fbbf24; font-weight: 700; }
+.insights-list li .tag-bad    { color: #f87171; font-weight: 700; }
+
+/* ═══════════════════════════════════════════
+   No-data placeholder
+═══════════════════════════════════════════ */
+.no-data {
+  text-align: center;
+  padding: 48px 24px;
+  color: #8aaccc;
+  font-size: 0.9rem;
+}
+.no-data strong { display: block; font-size: 1.05rem; margin-bottom: 6px; color: #5a7ba4; }
+
+/* ═══════════════════════════════════════════
+   Responsive
+═══════════════════════════════════════════ */
+@media (max-width: 900px) {
+  .view      { padding: 16px 16px 32px; }
+  .tab-bar   { padding: 10px 16px; }
+  .chart-row { grid-template-columns: 1fr; }
+  .kpi-cards { gap: 10px; }
+  .kpi-card  { flex: 1 1 130px; }
+  .header    { padding: 16px; }
+  .header h1 { font-size: 1.15rem; }
+}
+@media (max-width: 560px) {
+  .kpi-value { font-size: 1.45rem; }
+  .kpi-cards { flex-direction: column; }
+}
+
+/* ─── Deal Modal ─────────────────────────────────────────────────────────── */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(13,33,55,0.55);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000;
+}
+.modal-box {
+  background: #fff;
+  border-radius: 12px;
+  width: min(760px, 94vw);
+  max-height: 80vh;
+  display: flex; flex-direction: column;
+  box-shadow: 0 8px 32px rgba(13,33,55,0.18);
+}
+.modal-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  padding: 20px 24px 14px;
+  border-bottom: 1px solid #e8f0fb;
+}
+.modal-title   { font-size: 1.05rem; font-weight: 700; color: #0D2137; margin: 0; }
+.modal-subtitle { font-size: 0.82rem; color: #5a7ba4; margin: 2px 0 0; }
+.modal-close {
+  background: none; border: none; font-size: 1.1rem; color: #9CA3AF;
+  cursor: pointer; padding: 2px 6px; border-radius: 4px; line-height: 1;
+}
+.modal-close:hover { background: #f0f4fb; color: #0D2137; }
+.modal-body {
+  padding: 16px 24px 20px;
+  overflow-y: auto;
+  flex: 1;
+}
+.modal-loading { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 32px 0; color: #5a7ba4; }
+.modal-error   { color: #e05050; padding: 24px 0; text-align: center; }
+.modal-empty   { color: #5a7ba4; padding: 24px 0; text-align: center; }
+.modal-count   { font-size: 0.82rem; color: #5a7ba4; margin: 0 0 10px; }
+.deals-table   { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+.deals-table th { text-align: left; color: #5a7ba4; font-weight: 600; padding: 6px 8px; border-bottom: 1px solid #e8f0fb; white-space: nowrap; }
+.deals-table td { padding: 7px 8px; border-bottom: 1px solid #f3f7fd; color: #1B3A5C; }
+.deals-table tr:last-child td { border-bottom: none; }
+.deal-name   { font-weight: 500; max-width: 240px; }
+.deal-amount { font-weight: 600; white-space: nowrap; }
+.deal-stage  { background: #EBF3FC; color: #2B7CE9; border-radius: 4px; padding: 2px 7px; font-size: 0.78rem; white-space: nowrap; }
+.deal-link   { color: #2B7CE9; text-decoration: none; font-size: 1rem; }
+.deal-link:hover { text-decoration: underline; }

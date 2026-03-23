@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI.SEE Funnel Reporting</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-left">
+      <h1 id="pageTitle">AI.SEE Funnel Reporting</h1>
+      <p id="pageSubtitle">Übersicht aller Vertriebsstufen</p>
+    </div>
+    <div class="header-right">
+      <span class="date-badge" id="dateBadge">Aktualisiert: –</span>
+    </div>
+  </header>
+
+  <!-- TAB BAR -->
+  <div class="tab-bar">
+    <button class="tab-btn active" id="tab-uebersicht"  onclick="switchTab('uebersicht')">Übersicht</button>
+    <button class="tab-btn"        id="tab-marketing"   onclick="switchTab('marketing')">Marketing</button>
+    <button class="tab-btn"        id="tab-stage2"      onclick="switchTab('stage2')">Stage 2</button>
+    <button class="tab-btn"        id="tab-stage3"      onclick="switchTab('stage3')">Stage 3</button>
+    <button class="tab-btn"        id="tab-rebuy"       onclick="switchTab('rebuy')">Rebuy Funnel</button>
+  </div>
+
+  <!-- LOADING / ERROR -->
+  <div id="loadingState" class="state-message">
+    <div class="spinner"></div>
+    <p>Daten werden geladen…</p>
+  </div>
+  <div id="errorState" class="state-message hidden">
+    <p class="error-text" id="errorMsg"></p>
+    <button onclick="loadData()" class="retry-btn">Erneut versuchen</button>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       ÜBERSICHT TAB
+  ═══════════════════════════════════════════════════════════ -->
+  <div id="view-uebersicht" class="view hidden">
+
+    <!-- KPI CARDS -->
+    <section class="kpi-cards">
+      <div class="kpi-card border-blue">
+        <span class="kpi-label">Gesamtumsatz YTD</span>
+        <span class="kpi-value" id="ue-totalRevenue">–</span>
+        <span class="kpi-sub" id="ue-totalRevenueSub">–</span>
+      </div>
+      <div class="kpi-card border-purple">
+        <span class="kpi-label">Stage 2 Umsatz YTD</span>
+        <span class="kpi-value" id="ue-stage2Revenue">–</span>
+        <span class="kpi-sub" id="ue-stage2RevenueSub">–</span>
+      </div>
+      <div class="kpi-card border-blue">
+        <span class="kpi-label">Stage 3/4 Umsatz YTD</span>
+        <span class="kpi-value" id="ue-stage34Revenue">–</span>
+        <span class="kpi-sub" id="ue-stage34RevenueSub">–</span>
+      </div>
+      <div class="kpi-card border-green">
+        <span class="kpi-label">Rebuy Umsatz YTD</span>
+        <span class="kpi-value" id="ue-rebuyRevenue">–</span>
+        <span class="kpi-sub" id="ue-rebuyRevenueSub">–</span>
+      </div>
+      <div class="kpi-card border-orange">
+        <span class="kpi-label">Deals gewonnen YTD</span>
+        <span class="kpi-value" id="ue-deals">–</span>
+        <span class="kpi-sub" id="ue-dealsSub">–</span>
+      </div>
+    </section>
+
+    <!-- REVENUE TREND -->
+    <section class="dashboard-section">
+      <h2 class="section-title">Umsatzentwicklung – Plan vs. Ist</h2>
+      <div class="chart-row">
+        <div class="chart-box">
+          <p class="chart-label">Monatlicher Gesamtumsatz (Plan vs. Ist)</p>
+          <canvas id="ue-barRevenue"></canvas>
+        </div>
+        <div class="chart-box">
+          <p class="chart-label">Kumulierter Umsatz (YTD)</p>
+          <canvas id="ue-lineRevenueCum"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- ANNUAL TARGETS PROGRESS -->
+    <section class="dashboard-section">
+      <h2 class="section-title">Ziel-Erreichung 2026</h2>
+      <div id="ue-progressBars" class="progress-section"></div>
+    </section>
+
+    <!-- REVENUE SPLIT -->
+    <section class="dashboard-section">
+      <h2 class="section-title">Umsatz-Split nach Kategorie</h2>
+      <div class="chart-row">
+        <div class="chart-box">
+          <p class="chart-label">Ist-Umsatz nach Kategorie (YTD)</p>
+          <canvas id="ue-donut"></canvas>
+        </div>
+        <div class="chart-box">
+          <p class="chart-label">Stage 2 / Stage 3+4 / Rebuy – monatlicher Vergleich</p>
+          <canvas id="ue-barSplit"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- KEY INSIGHTS -->
+    <section class="insights-section">
+      <span class="insights-badge">KEY INSIGHTS</span>
+      <ul class="insights-list" id="ue-insights"></ul>
+    </section>
+
+  </div><!-- /view-uebersicht -->
+
+
+  <!-- ══════════════════════════════════════════════════════════
+       MARKETING TAB
+  ═══════════════════════════════════════════════════════════ -->
+  <div id="view-marketing" class="view hidden">
+
+    <section class="kpi-cards" id="mkt-cards"></section>
+
+    <section class="dashboard-section">
+      <h2 class="section-title">Marketing Funnel – Plan vs. Ist</h2>
+      <div class="chart-row" id="mkt-chartRow1">
+        <div class="chart-box">
+          <p class="chart-label">Monatliche Entwicklung</p>
+          <canvas id="mkt-barMain"></canvas>
+        </div>
+        <div class="chart-box">
+          <p class="chart-label">Kumulierter Fortschritt</p>
+          <canvas id="mkt-lineCum"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <section class="dashboard-section">
+      <h2 class="section-title">Ziel-Erreichung Marketing</h2>
+      <div id="mkt-progressBars" class="progress-section"></div>
+    </section>
+
+    <section class="insights-section">
+      <span class="insights-badge">KEY INSIGHTS</span>
+      <ul class="insights-list" id="mkt-insights"></ul>
+    </section>
+
+  </div><!-- /view-marketing -->
+
+
+  <!-- ══════════════════════════════════════════════════════════
+       STAGE 2 TAB
+  ═══════════════════════════════════════════════════════════ -->
+  <div id="view-stage2" class="view hidden">
+
+    <section class="kpi-cards" id="s2-cards"></section>
+
+    <section class="dashboard-section">
+      <h2 class="section-title">Stage 2 Websessions Held – Plan vs. Ist</h2>
+      <div class="chart-row">
+        <div class="chart-box">
+          <p class="chart-label">Monatliche Entwicklung</p>
+          <canvas id="s2-barMain"></canvas>
+        </div>
+        <div class="chart-box">
+          <p class="chart-label">Kumulierter Fortschritt</p>
+          <canvas id="s2-lineCum"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <section class="dashboard-section">
+      <h2 class="section-title">Stage 2 Offers Sent – Plan vs. Ist</h2>
+      <div class="chart-row">
+        <div class="chart-box">
+          <p class="chart-label">Monatliche Entwicklung</p>
+          <canvas id="s2-barOffers"></canvas>
+        </div>
+        <div class="chart-box">
+          <p class="chart-label">Kumulierter Fortschritt</p>
+          <canvas id="s2-lineCumOffers"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <section class="dashboard-section">
+      <h2 class="section-title">Stage 2 Deals Won – Plan vs. Ist</h2>
+      <div class="chart-row">
+        <div class="chart-box">
+          <p class="chart-label">Monatliche Entwicklung</p>
+          <canvas id="s2-barDeals"></canvas>
+        </div>
+        <div class="chart-box">
+          <p class="chart-label">Kumulierter Fortschritt</p>
+          <canvas id="s2-lineCumDeals"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <section class="dashboard-section">
+      <h2 class="section-title">Ziel-Erreichung Stage 2</h2>
+      <div id="s2-progressBars" class="progress-section"></div>
+    </section>
+
+    <section class="insights-section">
+      <span class="insights-badge">KEY INSIGHTS</span>
+      <ul class="insights-list" id="s2-insights"></ul>
+    </section>
+
+  </div><!-- /view-stage2 -->
+
+
+  <!-- ══════════════════════════════════════════════════════════
+       STAGE 3 TAB
+  ═══════════════════════════════════════════════════════════ -->
+  <div id="view-stage3" class="view hidden">
+
+    <section class="kpi-cards" id="s3-cards"></section>
+
+    <section class="dashboard-section">
+      <h2 class="section-title">Deals Won Stage 3 – Direct (NL) – Plan vs. Ist</h2>
+      <div class="chart-row">
+        <div class="chart-box">
+          <p class="chart-label">Monatliche Entwicklung</p>
+          <canvas id="s3-barMain"></canvas>
+        </div>
+        <div class="chart-box">
+          <p class="chart-label">Kumulierter Fortschritt</p>
+          <canvas id="s3-lineCum"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <section class="dashboard-section">
+      <h2 class="section-title">Deals Won Stage 3 – Phase 1 (JH) – Plan vs. Ist</h2>
+      <div class="chart-row">
+        <div class="chart-box">
+          <p class="chart-label">Monatliche Entwicklung</p>
+          <canvas id="s3-barPhase1"></canvas>
+        </div>
+        <div class="chart-box">
+          <p class="chart-label">Kumulierter Fortschritt</p>
+          <canvas id="s3-lineCumPhase1"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <section class="dashboard-section">
+      <h2 class="section-title">Ziel-Erreichung Stage 3</h2>
+      <div id="s3-progressBars" class="progress-section"></div>
+    </section>
+
+    <section class="insights-section">
+      <span class="insights-badge">KEY INSIGHTS</span>
+      <ul class="insights-list" id="s3-insights"></ul>
+    </section>
+
+  </div><!-- /view-stage3 -->
+
+
+  <!-- ══════════════════════════════════════════════════════════
+       REBUY FUNNEL TAB
+  ═══════════════════════════════════════════════════════════ -->
+  <div id="view-rebuy" class="view hidden">
+
+    <section class="kpi-cards" id="rb-cards"></section>
+
+    <section class="dashboard-section">
+      <h2 class="section-title">Rebuy Funnel – Plan vs. Ist</h2>
+      <div class="chart-row">
+        <div class="chart-box">
+          <p class="chart-label">Monatliche Entwicklung</p>
+          <canvas id="rb-barMain"></canvas>
+        </div>
+        <div class="chart-box">
+          <p class="chart-label">Kumulierter Fortschritt</p>
+          <canvas id="rb-lineCum"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <section class="dashboard-section">
+      <h2 class="section-title">Ziel-Erreichung Rebuy</h2>
+      <div id="rb-progressBars" class="progress-section"></div>
+    </section>
+
+    <section class="insights-section">
+      <span class="insights-badge">KEY INSIGHTS</span>
+      <ul class="insights-list" id="rb-insights"></ul>
+    </section>
+
+  </div><!-- /view-rebuy -->
+
+  <!-- DEAL MODAL -->
+  <div id="dealModal" class="modal-overlay hidden" onclick="handleModalOverlayClick(event)">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div>
+          <h3 id="modalTitle" class="modal-title">Deals</h3>
+          <p id="modalSubtitle" class="modal-subtitle"></p>
+        </div>
+        <button class="modal-close" onclick="closeModal()">&#x2715;</button>
+      </div>
+      <div id="modalBody" class="modal-body"></div>
+    </div>
+  </div>
+
+  <script src="dashboard.js"></script>
+
+</body>
+</html>

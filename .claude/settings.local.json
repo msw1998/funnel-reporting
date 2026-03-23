@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e \":*)",
+      "Bash(start http://localhost:3004)",
+      "Bash(cmd /c \"taskkill /F /PID 11328 /PID 17056 /PID 23188 /PID 22660\")",
+      "Bash(findstr \":300\")"
+    ]
+  }
+}
