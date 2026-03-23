@@ -34,5 +34,5 @@ localPort = 5000
 externalPort = 80
 
 [deployment]
-deploymentTarget = "autoscale"
-run = ["node", "server.js"]
+deploymentTarget = "cloudrun"
+run = ["sh", "-c", "npm start"]
