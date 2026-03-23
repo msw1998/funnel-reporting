@@ -428,9 +428,13 @@ app.get('/api/hubspot/deals', async (req, res) => {
     return res.status(400).json({ error: 'start+end or month param required' });
   }
 
-  const isWs     = type === 'ws';
-  const isOffers = type === 'offers';
-  const isWon    = type === 'won';
+  const isWs       = type === 'ws';
+  const isOffers   = type === 'offers';
+  const isWon      = type === 'won';
+  const isS3Direct = type === 's3-direct';
+  const isS3Phase1 = type === 's3-phase1';
+
+  const S3_PROPERTIES = ['dealname', 'datum_websession', 'amount', 'createdate', 'hs_analytics_source', 'dealstage', 'ai_see_lifecycle_time', 'hs_projected_amount', 'hs_object_id'];
 
   const filters = isWs
     ? [
@@ -447,6 +451,18 @@ app.get('/api/hubspot/deals', async (req, res) => {
         { propertyName: 'hs_v2_date_entered_2660879', operator: 'BETWEEN', value: startMs, highValue: endMs },
         { propertyName: 'pipeline',                   operator: 'EQ',      value: '775171' },
       ]
+    : isS3Direct
+    ? [
+        { propertyName: 'hs_v2_date_entered_25756819', operator: 'BETWEEN', value: startMs, highValue: endMs },
+        { propertyName: 'pipeline',                    operator: 'EQ',      value: '9038883' },
+        { propertyName: 'hubspot_owner_id',            operator: 'EQ',      value: '616536452' },
+      ]
+    : isS3Phase1
+    ? [
+        { propertyName: 'hs_v2_date_entered_25756819', operator: 'BETWEEN', value: startMs, highValue: endMs },
+        { propertyName: 'pipeline',                    operator: 'EQ',      value: '9038883' },
+        { propertyName: 'hubspot_owner_id',            operator: 'EQ',      value: '398377013' },
+      ]
     : [
         { propertyName: 'closedate', operator: 'BETWEEN', value: startMs, highValue: endMs },
         { propertyName: 'pipeline',  operator: 'EQ',      value: '775171' },
@@ -458,6 +474,8 @@ app.get('/api/hubspot/deals', async (req, res) => {
     ? ['dealname', 'datum_websession', 'amount', 'createdate', 'hs_analytics_source', 'dealstage', 'time_websession_to_offer', 'hs_projected_amount', 'hs_object_id']
     : isWon
     ? ['dealname', 'datum_websession', 'hs_v2_date_entered_2660879', 'amount', 'createdate', 'hs_analytics_source', 'dealstage', 'in_deal_phase_seit', 'hs_projected_amount', 'hs_object_id']
+    : (isS3Direct || isS3Phase1)
+    ? S3_PROPERTIES
     : ['dealname', 'amount', 'closedate', 'dealstage', 'hs_analytics_source', 'createdate', 'hs_object_id'];
 
   const body = {

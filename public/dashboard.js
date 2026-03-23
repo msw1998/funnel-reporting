@@ -325,7 +325,9 @@ function renderFunnelTab(prefix, sheetData, tabLabel) {
         barDataset('Ist',  mainMetric.actual, C.blue),
       ],
       yFmt: mainFmt,
-      onClickIst: prefix === 's2' ? (monthLabel) => openWsDealsModal(monthLabel) : null,
+      onClickIst: prefix === 's2' ? (monthLabel) => openWsDealsModal(monthLabel)
+                : prefix === 's3' ? (monthLabel) => openS3DirectModal(monthLabel)
+                : null,
     });
 
     createLineChart(`${prefix}-lineCum`, {
@@ -352,6 +354,7 @@ function renderFunnelTab(prefix, sheetData, tabLabel) {
           barDataset('Ist',  phase1.actual, C.green),
         ],
         yFmt: fmtInt,
+        onClickIst: (monthLabel) => openS3Phase1Modal(monthLabel),
       });
       createLineChart('s3-lineCumPhase1', {
         labels: MONTHS,
@@ -977,6 +980,52 @@ async function openDealsWonModal(monthLabel) {
     console.log(`[Deals Won Modal] ${monthLabel} → startMs: ${range.start}, endMs: ${range.end}`);
 
     const res  = await fetch(`/api/hubspot/deals?start=${range.start}&end=${range.end}&type=won`);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+
+    renderDealsTable(body, data.results || [], data.total ?? (data.results || []).length, data.portalId);
+  } catch (e) {
+    body.innerHTML = `<div class="modal-error">Fehler: ${e.message}</div>`;
+  }
+}
+
+async function openS3DirectModal(monthLabel) {
+  const modal = document.getElementById('dealModal');
+  const body  = document.getElementById('modalBody');
+  document.getElementById('modalTitle').textContent    = 'Stage 3 – Deals Won Direct (NL)';
+  document.getElementById('modalSubtitle').textContent = monthLabel;
+  body.innerHTML = '<div class="modal-loading"><div class="spinner"></div><p>Lade Deals…</p></div>';
+  modal.classList.remove('hidden');
+
+  try {
+    const range = monthLabelToUnixRange(monthLabel);
+    if (!range) throw new Error('Ungültiger Monat');
+    console.log(`[S3 Direct Modal] ${monthLabel} → startMs: ${range.start}, endMs: ${range.end}`);
+
+    const res  = await fetch(`/api/hubspot/deals?start=${range.start}&end=${range.end}&type=s3-direct`);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+
+    renderDealsTable(body, data.results || [], data.total ?? (data.results || []).length, data.portalId);
+  } catch (e) {
+    body.innerHTML = `<div class="modal-error">Fehler: ${e.message}</div>`;
+  }
+}
+
+async function openS3Phase1Modal(monthLabel) {
+  const modal = document.getElementById('dealModal');
+  const body  = document.getElementById('modalBody');
+  document.getElementById('modalTitle').textContent    = 'Stage 3 – Deals Won Phase 1 (JH)';
+  document.getElementById('modalSubtitle').textContent = monthLabel;
+  body.innerHTML = '<div class="modal-loading"><div class="spinner"></div><p>Lade Deals…</p></div>';
+  modal.classList.remove('hidden');
+
+  try {
+    const range = monthLabelToUnixRange(monthLabel);
+    if (!range) throw new Error('Ungültiger Monat');
+    console.log(`[S3 Phase1 Modal] ${monthLabel} → startMs: ${range.start}, endMs: ${range.end}`);
+
+    const res  = await fetch(`/api/hubspot/deals?start=${range.start}&end=${range.end}&type=s3-phase1`);
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
 
